@@ -269,6 +269,9 @@ transition={{duration : 0.3, delay: 0.7}}
               />
     
        <Table
+       style={{border: '2px solid rgba(0, 0, 0, 0.1)', 
+       borderRadius : '15px'
+      }}
         loading={loading}
         columns={columns}
         dataSource={dataSource}

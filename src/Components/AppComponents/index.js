@@ -37,7 +37,7 @@ const AppRoutes = lazy(() => import("../AppRoutes"));
 
 
 const AppComponents = () => {
-  const [logoText, setLogoText] = useState("Cabinet Medical");
+  const [logoText, setLogoText] = useState("EHPM");
   const location = useLocation();
   const [selectedKeys, setSelectedKeys] = useState("/");
   const [collapsed, setCollapsed] = useState(false);
@@ -51,11 +51,11 @@ const AppComponents = () => {
   }, [location.pathname]);
   const navigate = useNavigate();
   const handleButtonClick = () => {
-    if (logoText === "Cabinet Medical") {
-      setLogoText("CM");
+    if (logoText === "EHPM") {
+      setLogoText("EH");
     } else {
       const timer = setTimeout(() => {
-        setLogoText("Cabinet Medical");
+        setLogoText("EHPM");
       }, 230);
 
       return () => {
@@ -162,9 +162,17 @@ const AppComponents = () => {
       hidden: !userRoles.includes("Admin"),
     },
     {
-      label: "Patient",
+      label: "Etudiant",
       key: "/patient",
       icon: <UserAddOutlined />,
+      
+     
+    },
+    {
+      label: "Formateur",
+      key: "/patient",
+      icon: <UserAddOutlined />,
+      hidden: !userRoles.includes("Admin"),
      
     },
     {
@@ -174,13 +182,13 @@ const AppComponents = () => {
       
     },
     {
-      label: "Vital",
+      label: "Facture",
       key: "/vital",
       icon: <IdcardOutlined />,
       hidden: !(userRoles.includes("Admin") || userRoles.includes("Medecin")) ,
     },
     {
-      label: "Pharmacie",
+      label: "Filière",
       key: "/pharmacie",
       icon: <PlusSquareOutlined />,
       hidden: !(userRoles.includes("Admin") || userRoles.includes("Medecin")),
@@ -256,6 +264,8 @@ const AppComponents = () => {
             style={{
               padding: 0,
               background: colorBgContainer,
+              borderRadius: '10px',
+              border: '2px solid rgba(0, 0, 0, 0.1)', 
             }}
           >
             <Button
@@ -295,18 +305,21 @@ const AppComponents = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, delay: 0.7 }}
           >
-            <Content
-              style={{
-                margin: '24px 16px',
-                padding: 24,
-                height: '100%',
-                minHeight: 280,
-                background: colorBgContainer,
-                overflow: 'auto',
-                flex: 1,
-                animation: 'fadeIn 0.5s ease-in-out',
-              }}
-            >
+           <Content
+  style={{
+    margin: '24px 16px',
+    padding: 24,
+    height: '100%',
+    minHeight: 280,
+    background: colorBgContainer, 
+    overflow: 'auto',
+    flex: 1,
+    animation: 'fadeIn 0.5s ease-in-out',
+    borderRadius: '20px',
+    border: '2px solid rgba(0, 0, 0, 0.1)', 
+  }}
+>
+
               <Suspense fallback={<div>Loading...</div>}>
               <AppRoutes /></Suspense>
             </Content>
