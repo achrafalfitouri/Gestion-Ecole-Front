@@ -1,5 +1,4 @@
 import {
-
   CalendarOutlined,
   UserAddOutlined,
   FileTextOutlined,
@@ -14,252 +13,271 @@ import {
   Typography,
   Badge,
   Calendar,
-  
   Button,
   Modal,
   Col,
   Row,
+  DatePicker,
 } from 'antd';
-import { Progress} from 'antd';
+import { Progress } from 'antd';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import { motion } from 'framer-motion';
-import "./style.css"
+import './style.css';
 
-function Dashboard() {
-  // les données des patients
-  const [patientCount, setPatientCount] = useState(0);
 
+
+
+
+
+
+
+function Dashboard({ data  }) {
+  const [patientCount, setPatientCount] = useState(data ? data.patientCount : 0);
+  const [patients, setPatients] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null); // Selected date
+  const [patientCountToday, setPatientCountToday] = useState(data ? data.patientCountToday : 0);
   useEffect(() => {
-    fetchPatients();
-  }, []);
+      if (data) {
+        setPatientCount(data.patientCount);
+        setPatientCountToday(data.patientCountToday);
+      }
+    }, [data]);
 
-  const fetchPatients = () => {
-    axios
-      .get('/api/patients')
-      .then((response) => {
-        const resultatData = response.data['hydra:member'];
-        const count = resultatData.length;
-        setPatientCount(count);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
+   
+      
+  if (!data) {
+    // Render a loading state or return null if dashboard data is not available yet
+    return null;
+  }
+
+  
+
+  const filterPatientsByDate = async (date) => {
+    if (!date) return { filteredPatients: [], filteredDate: null };
+  
+    const formattedDate = moment(date).format('YYYY-MM-DD'); // Format selected date
+    const url = `/api/patients?created_at=${formattedDate}`;
+  
+    try {
+      const response = await axios.get(url);
+      const filteredPatients = response.data; // Assuming the API returns the filtered patients directly
+      return { filteredPatients, filteredDate: formattedDate };
+    } catch (error) {
+      console.error('Error filtering patients by date:', error);
+      return { filteredPatients: [], filteredDate: null };
+    }
   };
+  
 
-  // les données des ordonances
-  const [ordonanceCount, setOrdonanceCount] = useState(0);
 
-  useEffect(() => {
-    fetchOrdonance();
-  }, []);
+    
+    
+ // Handle date change
+// Handle date change
+const handleDateChange = async (date, dateString) => {
+  setSelectedDate(dateString); // Update selected date
+  // Filter patients for the selected date
+  const { filteredPatients, filteredDate } = await filterPatientsByDate(dateString);
+  // Update state with filtered patients
+  setPatientCount(filteredPatients['hydra:member'].length);
 
-  const fetchOrdonance = () => {
-    axios
-      .get('/api/ordonances')
-      .then((response) => {
-        const ordonanceData = response.data['hydra:member'];
-        const count = ordonanceData.length;
-        setOrdonanceCount(count);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
+};
+console.log(patients)
+
+// Render the filtered patients
+
+
+
+
+    // Get filtered patients based on the selected date
+    const filteredPatients = filterPatientsByDate(selectedDate);
+  
+  const {
+    
+    ordonanceCount,
+    rendezvousCount,
+    examentestCount,
+    examenresultatCount,
+    
+  } = data;
+  
+
+  const handleCountTodayClick = () => {
+
+    setPatientCount(patientCountToday);
+
+    
+
   };
+  
+  const handleReset = () => {
 
-  // les données des rendez-vous
-  const [rendezvousCount, setRendezvousCount] = useState(0);
+    setPatientCount(data.patientCount);
 
-  useEffect(() => {
-    fetchRendezvous();
-  }, []);
+    
 
-  const fetchRendezvous = () => {
-    axios
-      .get('/api/rendezvouses')
-      .then((response) => {
-        const rendezvousData = response.data['hydra:member'];
-        const count = rendezvousData.length;
-        setRendezvousCount(count);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
   };
-
-  // les données des examentests
-
-  const [examentestCount, setExamentestCount] = useState(0);
-
-  useEffect(() => {
-    fetchExamentest();
-  }, []);
-
-  const fetchExamentest = () => {
-    axios
-      .get('/api/examentests')
-      .then((response) => {
-        const examentestData = response.data['hydra:member'];
-        const count = examentestData.length;
-        setExamentestCount(count);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
+  const buttonContainerStyle = {
+    display: 'flex',
+    gap: '10px',
   };
-
-  // les données des examenresultasts
-
-  const [examenresultatCount, setExamenresultatCount] = useState(0);
-
-  useEffect(() => {
-    fetchExamenresultat();
-  }, []);
-
-  const fetchExamenresultat = () => {
-    axios
-      .get('/api/examenresultats')
-      .then((response) => {
-        const examenresultatData = response.data['hydra:member'];
-        const count = examenresultatData.length;
-        setExamenresultatCount(count);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
-  };
-
+ 
+  
   //affichage
 
   return (
     <motion.div
+    
       initial={{ opacity: 0, translateX: -10, translateY: -10 }}
       animate={{ opacity: 1, translateY: -10 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.7 }}
     >
-      <Space size={20} direction='vertical'>
+      <Space size={[20, 20]}  direction='vertical'>
         <Typography.Title level={4}>Tableau de bord</Typography.Title>
+     
+        <div style={buttonContainerStyle}>
+        <DatePicker onChange={handleDateChange} />
+
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={handleCountTodayClick}>Année</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={handleCountTodayClick}>Mois</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={handleCountTodayClick}>jour</button>
+        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" type='default' onClick={handleReset}>Reset</button>
+        </div>
+
         <Space direction='horizontal'>
-          <Row>
-            <Col xs={{ span: 5, offset: 1 }}>
-              <DashboardCard
-                icon={
-                  <FileTextOutlined
-                    style={{
-                      color: 'green',
-                      backgroundColor: 'rgba(0,255,0,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Examen tests'}
-                value={examentestCount}
-              />
-              <DashboardCard
-                icon={
-                  <UserAddOutlined
-                    style={{
-                      color: 'blue',
-                      backgroundColor: 'rgba(0,0,255,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Patient'}
-                value={patientCount}
-              />
-            </Col>
+          <Row   gutter={[16, 16]}>
+            <Row  >
+              <Col offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+              
+                  icon={
+                    <UserAddOutlined
+                      style={{
+                        color: 'blue',
+                        backgroundColor: 'rgba(0,0,255,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Etudiant'}
+                  value={patientCount}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col  offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+                
+                  icon={
+                    <FileTextOutlined
+                      style={{
+                        color: 'green',
+                        backgroundColor: 'rgba(0,255,0,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Formateur'}
+                  value={examentestCount}
+                />
+              </Col>
+            </Row>
           </Row>
-          <Row>
-            <Col xs={{ span: 5, offset: 1 }}>
-              <DashboardCard
-                icon={
-                  <FileTextOutlined
-                    style={{
-                      color: 'green',
-                      backgroundColor: 'rgba(0,255,0,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Examen resultats'}
-                value={examenresultatCount}
-              />
-              <DashboardCard
-                icon={
-                  <DiffOutlined
-                    style={{
-                      color: 'blue',
-                      backgroundColor: 'rgba(0,0,255,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Ordonances'}
-                value={ordonanceCount}
-              />
-            </Col>
+          <Row gutter={[16, 16]}>
+            <Row>
+              <Col offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+
+                  icon={
+                    <CalendarOutlined
+                      style={{
+                        color: 'blue',
+                        backgroundColor: 'rgba(0,0,255,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Rendez-Vous'}
+                  value={rendezvousCount}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+                  icon={
+                    <FileTextOutlined
+                      style={{
+                        color: 'green',
+                        backgroundColor: 'rgba(0,255,0,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Filière'}
+                  value={examenresultatCount}
+                />
+              </Col>
+            </Row>
           </Row>
-          <Row>
-            <Col xs={{ span: 5, offset: 1 }}>
-              <DashboardCard
-                icon={
-                  <FolderOpenOutlined
-                    style={{
-                      color: 'green',
-                      backgroundColor: 'rgba(0,255,0,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Dossiers Medicaux'}
-                value={patientCount}
-              />
-              <DashboardCard
-                icon={
-                  <CalendarOutlined
-                    style={{
-                      color: 'blue',
-                      backgroundColor: 'rgba(0,0,255,0.25)',
-                      borderRadius: 20,
-                      fontSize: 24,
-                      padding: 8,
-                    }}
-                  />
-                }
-                title={'Rendez-Vous'}
-                value={rendezvousCount}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={{ span: 18, offset: 4 }}>
-              <DashboardChart />
-            </Col>
+          <Row gutter={[16, 16]}>
+            <Row>
+              <Col offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+                  icon={
+                    <DiffOutlined
+                      style={{
+                        color: 'blue',
+                        backgroundColor: 'rgba(0,0,255,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Inscription'}
+                  value={ordonanceCount}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col offset={2} xs={24} sm={12} md={8} lg={6} xl={6}>
+                <DashboardCard
+                  icon={
+                    <FolderOpenOutlined
+                      style={{
+                        color: 'green',
+                        backgroundColor: 'rgba(0,255,0,0.25)',
+                        borderRadius: 20,
+                        fontSize: 24,
+                        padding: 8,
+                      }}
+                    />
+                  }
+                  title={'Rapport de caisse'}
+                  value={patientCount}
+                />
+              </Col>
+            </Row>
           </Row>
         </Space>
-        
-          <Row>
-            <DerniersRv />
-          
-           
-              <div className='calendar'>
-              <DashboardCalendar /> 
-              </div>
-          </Row>
        
+          <DerniersRv />
+          
+            <DashboardCalendar />
+         
+      
       </Space>
     </motion.div>
   );
@@ -268,8 +286,18 @@ function Dashboard() {
 // le composant de carte
 function DashboardCard({ title, value, icon }) {
   return (
-    <Card style={{ height: '160px', width: '220px' }}>
-      <Space direction='horizontal'>
+    <Card
+    style={{
+      height: '120px',
+      width: '300px',
+      borderRadius: '20px',
+      border: 'none',
+      boxShadow: '2px 6px 14px rgba(0, 0, 0.1, 0.2)',
+    
+    }}
+  >
+
+      <Space direction="horizontal">
         {icon}
         <Statistic title={title} value={value} />
       </Space>
@@ -290,10 +318,9 @@ function DerniersRv() {
       const params = {
         page: currentPage,
         itemsPerPage: 3,
-       
         'order[created_at]': 'DESC'
       };
-  
+
       axios
         .get("/api/rendezvouses?pagination=true", { params })
         .then((response) => {
@@ -306,54 +333,39 @@ function DerniersRv() {
           setLoading(false);
         });
     };
-  
+
     setLoading(true);
     fetchRendezvouss();
   }, [currentPage, pageSize]);
 
   const columns = [
-    
-    { title: 'Nom de patient',dataIndex: 'nomPatient', key: 'nomPatient',width: '30%',},
-
-    { title: 'Email de patient',dataIndex: 'emailPatient',key: 'emailPatient',width: '30%',},
-
-    { title: 'Maladie', dataIndex: 'maladie', key: 'maladie', width: '30%' },
-
-    { title: 'Medecin', dataIndex: 'medecin', key: 'medecin', width: '30%' },
-
-    { title: 'Date de rendez-vous',dataIndex: 'dateRv',key: 'dateRv',width: '30%',render: (dateRv) => moment(dateRv).format('YYYY-MM-DD HH:mm:ss'), },
-  
+    { title: "Nom d'étudiant",dataIndex: 'nomPatient', key: 'nomPatient'},
+    { title: "Email d'étudiant",dataIndex: 'emailPatient',key: 'emailPatient'},
+    { title: 'Motif', dataIndex: 'maladie', key: 'maladie' },
+    { title: 'Réception', dataIndex: 'medecin', key: 'medecin' },
+    { title: 'Date de rendez-vous',dataIndex: 'dateRv',key: 'dateRv',render: (dateRv) => moment(dateRv).format('YYYY-MM-DD HH:mm:ss'), },
   ];
 
   return (
-    <Card title='Les derniers rendez-vous'>
-    <Row>
-      <Col
-        xs={{
-          span: 5,
-          offset: 1,
-        }}
-      >
-        
-        <>
-         
-          <Table
-            columns={columns}
-            loading={loading}
-            dataSource={dataSource}
-            pagination={false}
-            size='small'
-          ></Table>
-        </>
-      </Col>
-    </Row></Card>
+    <Card style={{width: '100%',borderRadius: '10px',
+    border: '2px solid rgba(0, 0, 0, 0.1)',boxShadow: '2px 6px 14px rgba(0, 0, 0.1, 0.2)' }} title='Les derniers rendez-vous'>
+    
+          <>
+            <Table
+              columns={columns}
+              loading={loading}
+              dataSource={dataSource}
+              pagination={false}
+              size='small'
+            ></Table>
+          </>
+       
+    </Card>
   );
 }
 
-
 //le composant de calendrier
 const DashboardCalendar = () => {
-  const [isvisible, setVisible] = useState(false); // State for controlling the visibility of the pop-up
   const [eventsData, setEventsData] = useState([]);
 
   useEffect(() => {
@@ -384,7 +396,7 @@ const DashboardCalendar = () => {
     const cellClass = isPastDate ? 'disabled-cell' : '';
 
     return (
-      <div className={`events ${cellClass}`}>
+      <div  className={`events ${cellClass}`}>
         {events.map((event, index) => (
           <div key={index}>
             <Badge
@@ -399,208 +411,14 @@ const DashboardCalendar = () => {
     );
   };
 
-  const handleOpenModal = () => {
-    setVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setVisible(false);
-  };
-
   return (
-    <>
-      <Button
-        size='large'
-        onClick={handleOpenModal}
-        icon={<CalendarOutlined />}
-        style={{marginBottom: '275px',  marginLeft: '0cm' }}
-      >
-        Ouvrir le calendrier
-      </Button>
-      <Modal
-        title='Calendrier'
-        open={isvisible}
-        onCancel={handleCloseModal}
-        footer={null}
-        width={1000}
-      >
-        <Calendar dateCellRender={dateCellRender} />
-       
-      </Modal>
-    
-    </>
+    <Card style={{width: '100%',borderRadius: '10px',
+    border: '2px solid rgba(0, 0, 0, 0.1)',boxShadow: '2px 6px 14px rgba(0, 0, 0.1, 0.2)' }} title='Calendrier'>
+      <>
+      <Calendar dateCellRender={dateCellRender} />
+      </>
+    </Card>
   );
 };
 
-const DashboardChart = () => {
-  const [, setPatientCount] = useState(0);
-  const [, setExamenresultatCount] = useState(0);
-  const [, setExamentestCount] = useState(0);
-  const [, setOrdonanceCount] = useState(0);
-  const [, setRendezvousCount] = useState(0);
-  const [, setTotalCount] = useState(0);
-  const [percent, setPercent] = useState(0);
-  const [percent1, setPercent1] = useState(0);
-  const [percent2, setPercent2] = useState(0);
-  const [percent3, setPercent3] = useState(0);
-  const [percent4, setPercent4] = useState(0);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = () => {
-    const rendezvousPromise = axios.get(
-      '/api/rendezvouses'
-    );
-    const patientPromise = axios.get('/api/patients');
-    const ordonancePromise = axios.get('/api/ordonances');
-    const examentestPromise = axios.get(
-      '/api/examentests'
-    );
-    const examenresultatPromise = axios.get(
-      '/api/examenresultats'
-    );
-
-    Promise.all([
-      rendezvousPromise,
-      patientPromise,
-      ordonancePromise,
-      examentestPromise,
-      examenresultatPromise,
-    ])
-      .then((responses) => {
-        const rendezvousData = responses[0].data['hydra:member'];
-        const patientData = responses[1].data['hydra:member'];
-        const ordonanceData = responses[2].data['hydra:member'];
-        const examentestData = responses[3].data['hydra:member'];
-        const examenresultatData = responses[4].data['hydra:member'];
-
-        setRendezvousCount(rendezvousData.length);
-        setPatientCount(patientData.length);
-        setOrdonanceCount(ordonanceData.length);
-        setExamentestCount(examentestData.length);
-        setExamenresultatCount(examenresultatData.length);
-
-        const total = rendezvousData.length;
-        setTotalCount(total);
-
-        const calculatedPercent =  ( patientData.length / patientData.length)* 100
-        const calculatedPercent1 = (rendezvousData.length / patientData.length ) * 100;
-        const calculatedPercent2 = (ordonanceData.length / total) * 100;
-        const calculatedPercent3 = (examentestData.length / total) * 100;
-        const calculatedPercent4 = (examenresultatData.length / total) * 100;
-        setPercent(calculatedPercent);
-        setPercent1(calculatedPercent1);
-        setPercent2(calculatedPercent2);
-        setPercent3(calculatedPercent3);
-        setPercent4(calculatedPercent4);
-      })
-      .catch((error) => {
-        console.error('Error fetching data from API:', error);
-      });
-  };
-
-  return (
-    <>
-      <Row>
-        <Col xs={{ span: 5, offset: 1 }}>
-          <div
-            style={{ display: 'flex', alignItems: 'center' }}
-            className='progress-group'
-          >
-            <div style={{ marginRight: '20px' }}>
-              <h5>Patients</h5>
-              <Space wrap>
-                <Progress
-                  type='circle'
-                  percent={percent}
-                  strokeColor={{
-                    '0%': '#108ee9',
-                    '100%': '#87d068',
-                  }}
-                />
-              </Space>
-            </div>
-            <div style={{ marginRight: '20px' }}>
-              <h5>Rendez-vous</h5>
-              <Space wrap>
-                <Progress
-                  type='circle'
-                  percent={percent1}
-                  format={() => `${Math.round(percent1)}%`}
-                  strokeColor={{
-                    '0%': '#108ee9',
-                    '100%': '#87d068',
-                  }}
-                />
-              </Space>
-            </div>
-            <div style={{ marginRight: '20px' }}>
-              <h5>Rendez-vous consulté</h5>
-              <Space wrap>
-                <Progress
-                  type='circle'
-                  percent={percent2}
-                  format={() => `${Math.round(percent2)}%`}
-                  strokeColor={{
-                    '0%': '#108ee9',
-                    '100%': '#87d068',
-                  }}
-                />
-              </Space>
-            </div>
-          </div>
-        </Col>
-      </Row>
-      <div
-        style={{ display: 'flex', alignItems: 'center' }}
-        className='progress-group'
-      >
-        <div style={{ marginRight: '20px' }}>
-          <h5>Examen tests</h5>
-          <Space wrap>
-            <Progress
-              type='circle'
-              percent={percent3}
-              format={() => `${Math.round(percent3) !== null ? Math.round(percent3) + '%' : '0%'}`}
-              strokeColor={{
-                '0%': '#108ee9',
-                '100%': '#87d068',
-              }}
-            />
-          </Space>
-        </div>
-        <div style={{ marginRight: '20px' }}>
-          <h5>Examen resultats</h5>
-          <Space wrap>
-            <Progress
-              type='circle'
-              percent={percent4}
-              format={() => `${Math.round(percent4)}%`}
-              strokeColor={{
-                '0%': '#108ee9',
-                '100%': '#87d068',
-              }}
-            />
-          </Space>
-        </div>
-        <div style={{ marginRight: '20px' }}>
-          <h5>Dossiers medicaux</h5>
-          <Space wrap>
-            <Progress
-              type='circle'
-              percent={percent1}
-              format={() => `${Math.round(percent1)}%`}
-              strokeColor={{
-                '0%': '#108ee9',
-                '100%': '#87d068',
-              }}
-            />
-          </Space>
-        </div>
-      </div>
-    </>
-  );
-};
 export default Dashboard;

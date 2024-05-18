@@ -49,7 +49,7 @@ transition={{duration : 0.3, delay: 0.7}}
 >
 
     <Form name="form_item_path" layout="vertical" initialValues={initialValues} onFinish={onFinish}>
-          <Typography.Title level={4}>Modifier le Patient</Typography.Title>
+          <Typography.Title level={4}>Modifier l'etudiant</Typography.Title>
           <Row>
     <Col
   xs={{

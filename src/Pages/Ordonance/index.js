@@ -268,13 +268,13 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
 
   const columns = [
     
-    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", width:'30%',
+    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient",
     },
     {
       title: "Nom de medicament",
       dataIndex: "nomMedicament",
       key: "nomMedicament",
-      width: '30%',
+    
       render: (nomMedicament) => {
         let formattedMedicament = "";
         for (let i = 0; i < nomMedicament.length; i++) {
@@ -283,7 +283,7 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
             formattedMedicament += ", ";
           }} return formattedMedicament;},
         },
-    { title: "Maladie", dataIndex: "maladie", key: "maladie" , width:'30%',
+    { title: "Maladie", dataIndex: "maladie", key: "maladie" 
      },
    
    
@@ -308,7 +308,7 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
         ),
       }
       ,
-      {
+      {  
         key: 'operation',
         fixed: 'right',
         width: 100,
@@ -365,26 +365,21 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
     >
     
     
-        <Row>
-        <Col
-      xs={{
-        span: 1,
-        offset: -1,
-      }}
-      
-    >
-    {showTable && (<Space size={20} direction="vertical">
+       
+    {showTable && (<Space size={20} direction="vertical" style={{ width: '100%' }}>
           <Typography.Title level={4}>Ordonance</Typography.Title>
           
          
-        <Button
+        <button
+         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
+
           onClick={() => handleAddClick()}
           type="primary"
           variant="contained"
           disableElevation
         >
           <b>Ajouter une ordonance</b>
-        </Button>
+        </button>
      
         <Input.Search
                 style={{ width: '200px' }}
@@ -394,6 +389,8 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
               />
         
            <Table
+            style={{borderRadius: '10px',
+            border: '2px solid rgba(0, 0, 0, 0.1)' }} 
             loading={loading}
             columns={columns}
             dataSource={dataSource}
@@ -401,11 +398,12 @@ const [selectedOrdonanceId, setSelectedOrdonanceId] = useState(null);
               current: currentPage,
               pageSize: pageSize,
               total: totalItems,
+              position: ['bottomCenter'],
             }}
             onChange={handleTableChange}
 
           ></Table>  
-        </Space>)}</Col></Row>
+        </Space>)}
     
         {showModifierForm && (
             <ModifierOrdonance

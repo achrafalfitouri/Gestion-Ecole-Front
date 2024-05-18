@@ -201,13 +201,14 @@ function Vital() {
   };
   
   const columns = [
-    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", width: '30%' },
-    { title: "Assurance", dataIndex: "assurance", key: "assurance", width: '30%' },
-    { title: "Nemuro d'assurance", dataIndex: "nemuroAssurance", key: "nemuroAssurance", width: '30%' },
+    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", },
+    { title: "Assurance", dataIndex: "assurance", key: "assurance", },
+    { title: "Numero d'assurance", dataIndex: "nemuroAssurance", key: "nemuroAssurance" },
     {
-        title: "Action",
-        fixed: 'right',
-        width: '200',
+        
+        
+       fixed: 'right',
+       
         render: (_, record) => (
           <div style={{ display: 'flex', gap: '10px' }}>
    <Button  onClick={() => handleVoirClick(record.id)}>
@@ -236,19 +237,19 @@ function Vital() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.7 }}
     >
-      <Row>
-        <Col xs={{ span: 1, offset: -1 }}>
+     
           {showTable && (
-            <Space size={20} direction="vertical">
+            <Space size={20} direction="vertical" style={{ width: '100%' }}>
               <Typography.Title level={4}>Vital</Typography.Title>
-              <Button
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
                 onClick={() => handleAddClick()}
                 type="primary"
                 variant="contained"
                 disableElevation
               >
                 <b>Ajouter une vital</b>
-              </Button>
+              </button>
               <Input.Search
                 style={{ width: '200px' }}
                 placeholder="Rechercher par nom "
@@ -256,6 +257,8 @@ function Vital() {
                 enterButton
               />
               <Table
+               style={{borderRadius: '10px',
+               border: '2px solid rgba(0, 0, 0, 0.1)' }} 
                 loading={loading}
                 columns={columns}
                 dataSource={dataSource}
@@ -263,13 +266,13 @@ function Vital() {
                   current: currentPage,
                   pageSize: pageSize,
                   total: totalItems,
+                  position: ['bottomCenter'],
                 }}
                 onChange={handleTableChange}
               ></Table>
             </Space>
           )}
-        </Col>
-      </Row>
+       
 
       {showModifierForm && (
         <ModifierVital

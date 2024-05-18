@@ -142,11 +142,19 @@ function Pharmacie() {
    
   };
 
+
+
+  const buttonContainerStyle = {
+    display: 'flex',
+    gap: '10px',
+  };
+ 
+
   const columns = [
-    { title: "nom", dataIndex: "nom", key: "nom", width: '30%' },
-    { title: "code_bare", dataIndex: "code_bare", key: "code_bare", width: '30%' },
-    { title: "nom_categorie", dataIndex: "nom_categorie", key: "nom_categorie", width: '30%' },
-    { title: "description", dataIndex: "description", key: "description", width: '30%' },
+    { title: "Nom", dataIndex: "nom", key: "nom"},
+    { title: "Code bare", dataIndex: "code_bare", key: "code_bare", },
+    { title: "Nom de categorie", dataIndex: "nom_categorie", key: "nom_categorie", },
+    { title: "Description", dataIndex: "description", key: "description", },
     {
       key: 'operation',
       fixed: 'right',
@@ -181,31 +189,33 @@ function Pharmacie() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.7 }}
     >
-      <Row>
-        <Col xs={{ span: 1, offset: -1 }}>
+     
           {showTable && (
-            <Space size={20} direction="vertical">
+            <Space size={20} direction="vertical" style={{ width: '100%' }}>
               <Typography.Title level={4}>Pharmacie</Typography.Title>
-            
-              <Button
+              <div style={buttonContainerStyle}>
+
+              <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
+
                 onClick={() => handleAddClick()}
                 type="primary"
                 variant="contained"
                 disableElevation
               >
                 <b>Ajouter un medicament</b>
-              </Button>
+              </button>
             
-        <Col style={{marginTop: '-53px'}} xs={{ span: 1, offset: 9 }}>
-              <Button
-                onClick={() => handleAddClick2()}
+        
+              <button
+className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                onClick={() => handleAddClick2()}
                 type="primary"
                 variant="contained"
                 disableElevation
                 
               >
                 <b>Ajouter une categorie</b>
-              </Button> </Col>
+              </button> </div>
               <Input.Search
                 style={{ width: '200px' }}
                 placeholder="Rechercher par nom"
@@ -213,6 +223,8 @@ function Pharmacie() {
                 enterButton
               />
               <Table
+               style={{borderRadius: '10px',
+               border: '2px solid rgba(0, 0, 0, 0.1)' }} 
                 loading={loading}
                 columns={columns}
                 dataSource={dataSource}
@@ -220,13 +232,13 @@ function Pharmacie() {
                   current: currentPage,
                   pageSize: pageSize,
                   total: totalItems,
+                  position: ['bottomCenter'],
                 }}
                 onChange={handleTableChange}
               ></Table>
             </Space>
           )}
-        </Col>
-      </Row>
+        
 
       {showModifierForm && (
         <ModifierMedicament

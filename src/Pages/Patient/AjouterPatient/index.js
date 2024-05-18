@@ -95,7 +95,7 @@ const AjouterPatient = ({ onSubmit }) => {
       transition={{ duration: 0.3, delay: 0.7 }}
     >
       <Form name="form_item_path" layout="vertical" onFinish={onFinish}>
-        <Typography.Title level={4}>Ajouter un Patient</Typography.Title>
+        <Typography.Title level={4}>Ajouter un etudiant</Typography.Title>
         <Row>
           <Col xs={{ span: 9, offset: 7 }}>
             <MyFormItemGroup prefix={['user']}>

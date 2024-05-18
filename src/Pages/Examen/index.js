@@ -395,14 +395,14 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
 
   const columns = [
   
-    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", width:'30%',
+    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", 
     },
-    { title: "Nom de test", dataIndex: "nomTest", key: "nomTest", width:'30%',
+    { title: "Nom de test", dataIndex: "nomTest", key: "nomTest", 
      },
-    { title: "Maladie", dataIndex: "maladie", key: "maladie" , width:'30%',
+    { title: "Maladie", dataIndex: "maladie", key: "maladie" , 
      },
    
-    { title: "Date de test", dataIndex: "dateTest", key: "dateTest" , width:'30%',
+    { title: "Date de test", dataIndex: "dateTest", key: "dateTest" ,
      
     render: (dateTest) => moment(dateTest).format('YYYY-MM-DD HH:mm:ss')
   },
@@ -430,8 +430,8 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
       }
       ,{
         dataIndex: 'operation',
-        
         width: 100,
+        
         render: (_, record) =>
           dataSource.length >= 1 ? (
             <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
@@ -448,11 +448,11 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
 
   const columns1 = [
    
-    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient", width:'30%',
+    { title: "Nom de patient", dataIndex: "nomPatient", key: "nomPatient",
    },
-    { title: "Nom de test", dataIndex: "nomTest", key: "nomTest", width:'30%',
+    { title: "Nom de test", dataIndex: "nomTest", key: "nomTest",
      },
-    { title: "Maladie", dataIndex: "maladie", key: "maladie" , width:'30%',
+    { title: "Maladie", dataIndex: "maladie", key: "maladie" ,
      },
    
   
@@ -511,7 +511,11 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
   ];
   
 
-
+  const buttonContainerStyle = {
+    display: 'flex',
+    gap: '10px',
+  };
+ 
 
 
 
@@ -532,36 +536,31 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
     >
     
     
-        <Row>
-        <Col
-      xs={{
-        span: 1,
-        offset: -1,
-      }}
-      
-    >
-    {showTable && (<Space size={20} direction="vertical">
+     
+    {showTable && (<Space size={20} direction="vertical" style={{ width: '100%' }}>
           <Typography.Title level={4}>Examen</Typography.Title>
           
-         
-        <Button
+          <div style={buttonContainerStyle}>
+
+        <button
+         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
           onClick={() => handleAddClick()}
           type="primary"
           variant="contained"
           disableElevation
         >
           <b>Ajouter un test</b>
-        </Button>
-        <Col style={{marginTop: '-53px'}} xs={{ span: 1, offset: 9 }}>
-        <Button
+        </button>
+        <button 
+         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
           onClick={() => handleAddClick1()}
           type="primary"
           variant="contained"
           disableElevation
         >
           <b>Ajouter une resultat</b>
-        </Button> </Col>
-     
+        </button> 
+     </div>
         <Input.Search
                 style={{ width: '200px' }}
                 placeholder="Search by name"
@@ -570,6 +569,8 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
               />
         
            <Table
+            style={{borderRadius: '10px',
+            border: '2px solid rgba(0, 0, 0, 0.1)' }} 
             loading={loading}
             columns={columns}
           
@@ -579,12 +580,15 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
               current: currentPage,
               pageSize: pageSize,
               total: totalItems,
+              position: ['bottomCenter'],
             }}
             onChange={handleTableChange}
 
           ></Table>  
         
            <Table
+           style={{borderRadius: '10px',
+           border: '2px solid rgba(0, 0, 0, 0.1)' }} 
             loading={loading}
             
             columns={columns1}
@@ -594,11 +598,12 @@ const [selectedExamenresultatId, setselectedExamenresultatId] = useState(null);
               current: currentPage,
               pageSize: pageSize,
               total: totalItems,
+              position: ['bottomCenter'],
               
             }}
             onChange={handleTableChange}
           ></Table>  
-        </Space>)}</Col></Row>
+        </Space>)}
     
         {showModifierForm && (
             <ModifierTest

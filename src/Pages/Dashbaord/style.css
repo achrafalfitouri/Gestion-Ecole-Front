@@ -1,10 +1,13 @@
+/* Define a custom class for smaller cards */
+.smallCard {
+    width: 100%; /* Initially, set width to 100% for full-width display */
+}
 
+/* Add media query to adjust card width on smaller screens */
+@media (min-width: 768px) { /* Adjust the breakpoint as needed */
+    .smallCard {
+        width: calc(50% - 20px); /* Set width to 50% with gutter spacing */
+        /* You can adjust the gutter spacing as needed */
+    }
+}
 
-
-  
-  .calendar {
-   padding-right: 4cm;
-  }
-  
-  
-  

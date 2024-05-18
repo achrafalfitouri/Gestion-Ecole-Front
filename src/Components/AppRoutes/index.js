@@ -8,6 +8,9 @@ import Unauthorized from "../../Pages/Unauthorized";
 import { AnimatePresence } from 'framer-motion';
 import axios from "axios";
 import React, { lazy } from "react";
+import { fetchUserData } from "../interceptors/axios"; // Import fetchUserData from axios.js
+import DashboardDataProvider from '../../Pages/Dashbaord/DashboardProvider';
+
 
 import { useEffect,useState } from "react";
 
@@ -24,37 +27,25 @@ const Examen = lazy(() => import("../../Pages/Examen"));
 function AppRoutes() {
 
   const [userRoles, setUserRoles] = useState([]);
-  const [, setUser] = useState(null);
 
   useEffect(() => {
-   
-
-    const token = Cookies.get("token");
-    if (token) {
-      const fetchUserData = async () => { try {
-        const response = await axios.get("/api/user/me", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const userData = response.data;
-        setUser(userData);
-        setUserRoles(userData.specialite);
-
-       
+    const fetchData = async () => {
+      try {
+        let userData = JSON.parse(localStorage.getItem("userData")); // Check if user data exists in local storage
+        if (!userData) {
+          userData = await fetchUserData(); // Fetch user data if not available in local storage
+          localStorage.setItem("userData", JSON.stringify(userData)); // Store user data in local storage
+        }
         
+        setUserRoles(userData.specialite);
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching user data:', error);
+        // Handle error if necessary
       }
     };
 
-    fetchUserData();
-  } else {
-    
-  }
-}, );
-
+    fetchData();
+  }, []);
 // Render the Utilisateur component only when userRoles are loaded
 
 
@@ -66,7 +57,7 @@ function AppRoutes() {
      
       <Routes>
         {/* Dashboard */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<DashboardDataProvider>{(data) => <Dashboard data={data} />}</DashboardDataProvider>} />
 
         {/* Patient */}
        

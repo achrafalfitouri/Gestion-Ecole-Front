@@ -146,18 +146,18 @@ function RendezVous() {
   
 
   const columns = [
-    { title: "Nom du patient", dataIndex: "nomPatient", key: "nomPatient", width: '30%' },
-    { title: "Email du patient", dataIndex: "emailPatient", key: "emailPatient", width: '30%' },
-    { title: "Maladie", dataIndex: "maladie", key: "maladie", width: '30%' },
-    { title: "Médecin", dataIndex: "medecin", key: "medecin", width: '30%' },
+    { title: "Nom du patient", dataIndex: "nomPatient", key: "nomPatient",  },
+    { title: "Email du patient", dataIndex: "emailPatient", key: "emailPatient", },
+    { title: "Maladie", dataIndex: "maladie", key: "maladie",  },
+    { title: "Médecin", dataIndex: "medecin", key: "medecin",  },
     {
-      title: "Date du rendez-vous", dataIndex: "dateRv", key: "dateRv", width: '30%',
+      title: "Date du rendez-vous", dataIndex: "dateRv", key: "dateRv",
       render: (dateRv) => moment(dateRv).format('YYYY-MM-DD HH:mm:ss')
     },
     {
-      title: "Action",
+      
       fixed: 'right',
-      width: '200',
+      
       render: (_, record) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button type="primary" onClick={() => handleModifyClick(record.id)}>
@@ -181,19 +181,19 @@ function RendezVous() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.7 }}
     >
-      <Row>
-        <Col xs={{ span: 1, offset: -1 }}>
+      
           {showTable && (
-            <Space size={20} direction="vertical">
+            <Space size={20} direction="vertical" style={{ width: '100%' }} >
               <Typography.Title level={4}>Rendez-vous</Typography.Title>
-              <Button
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
                 onClick={() => handleAddClick()}
                 type="primary"
                 variant="contained"
                 disableElevation
               >
                 <b>Ajouter un rendez-vous</b>
-              </Button>
+              </button>
               {/* Tableu d'affichage des données */}
               <Input.Search
                 style={{ width: '200px' }}
@@ -201,22 +201,30 @@ function RendezVous() {
                 onSearch={handleSearch}
                 enterButton
               />
-              <Table
-                loading={loading}
-                columns={columns}
-                dataSource={dataSource}
-                pagination={{
-                  current: currentPage,
-                  pageSize: pageSize,
-                  total: totalItems,
-                }}
-                onChange={handleTableChange}
-              ></Table>
+
+
+    <Table
+      style={{
+        borderRadius: '10px',
+        border: '2px solid rgba(0, 0, 0, 0.1)',
+      }}
+      loading={loading}
+      columns={columns}
+      dataSource={dataSource}
+      pagination={{
+        current: currentPage,
+        pageSize: pageSize,
+        total: totalItems,
+        position: ['bottomCenter'],
+      }}
+      onChange={handleTableChange}
+    />
+ 
+            
+             
             </Space>
           )}
-        </Col>
-      </Row>
-
+       
       {showModifierForm && (
         <ModifierRv
           initialValues={initialFormValues}

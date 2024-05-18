@@ -386,7 +386,7 @@ const AfficherDossier = ({ patient, initialValues, onSubmit, examenTests, examen
 
               ></Table> </div>
                
-            <Button href="/dossiermedicaux" danger type="text">
+            <Button href="/dossiersmedicaux" danger type="text">
               Annuler
             </Button>
            

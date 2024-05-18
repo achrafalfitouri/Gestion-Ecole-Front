@@ -131,16 +131,27 @@ const [selectedUtilisateurId, setSelectedUtilisateurId] = useState(null);
     console.log(selectedUtilisateurId);
     axios.put(`/api/users/${selectedUtilisateurId}`, values)
       .then(() => {
-        
-        setSelectedUtilisateurId(null);
-        
-        setShowModifierForm(false);
-        window.location.reload();
+        axios.get("/api/user/me")
+          .then((response) => {
+            const userData = response.data;
+            // Save user data to local storage
+            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('userData', JSON.stringify(userData));
+  
+            setSelectedUtilisateurId(null);
+  
+            setShowModifierForm(false);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error('Error getting user data:', error);
+          });
       })
       .catch((error) => {
         console.error('Error updating utilisateur:', error);
       });
   };
+  
 
 
 
@@ -189,24 +200,24 @@ const [selectedUtilisateurId, setSelectedUtilisateurId] = useState(null);
 
   const columns = [
    
-    { title: "Email", dataIndex: "email", key: "email" , width: '30%',
+    { title: "Email", dataIndex: "email", key: "email" ,
      },
-    { title: "nom", dataIndex: "nom", key: "nom", width: '30%',
+    { title: "Nom", dataIndex: "nom", key: "nom",
     },
     
    
     
-    { title: "Tel", dataIndex: "tel", key: "tel" , width: '30%',
+    { title: "Tel", dataIndex: "tel", key: "tel" ,
      },
-    { title: "Adresse", dataIndex: "adresse", key: "adresse" , width: '30%',
+    { title: "Adresse", dataIndex: "adresse", key: "adresse" ,
      },
-     { title: "Roles", dataIndex: "specialite", key: "specialite" , width: '30%',
+     { title: "Roles", dataIndex: "specialite", key: "specialite" ,
      },
     
      {
-      title: "Action",
+     
       fixed: 'right',
-      width: '200',
+     
       render: (_, record) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button type="primary" onClick={() => handleModifyClick(record.id)}>
@@ -238,26 +249,23 @@ transition={{duration : 0.3, delay: 0.7}}
 >
 
 
-    <Row>
-    <Col
-  xs={{
-    span: 1,
-    offset: -1,
-  }}
   
->
-{showTable && (<Space size={20} direction="vertical">
+  
+
+{showTable && (<Space size={20} direction="vertical" style={{ width: '100%' }}>
       <Typography.Title level={4}>Utilisateur</Typography.Title>
       
      
-    <Button
+    <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full font-medium antialiased"                
+
       onClick={() => handleAddClick()}
       type="primary"
       variant="contained"
       disableElevation
     >
       <b>Ajouter un utilisateur</b>
-    </Button>
+    </button>
 
     {/* la table des utilisateurs */}
     
@@ -269,9 +277,8 @@ transition={{duration : 0.3, delay: 0.7}}
               />
     
        <Table
-       style={{border: '2px solid rgba(0, 0, 0, 0.1)', 
-       borderRadius : '15px'
-      }}
+       style={{borderRadius: '10px',
+       border: '2px solid rgba(0, 0, 0, 0.1)'}}
         loading={loading}
         columns={columns}
         dataSource={dataSource}
@@ -281,9 +288,10 @@ transition={{duration : 0.3, delay: 0.7}}
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
+          position: ['bottomCenter'],
         }}
       ></Table>  
-    </Space>)}</Col></Row>
+    </Space>)}
 
     {showModifierForm && (
         <ModifierUtilisateur

@@ -1,78 +1,111 @@
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 axios.defaults.baseURL = 'http://127.0.0.1:8000';
 
-let refresh = false;
+let isRefreshing = false;
+let refreshPromise = null;
+let accessTokenExpiry = null;
 
-// Fonction pour mettre à jour les cookies
-const updateCookies = (newToken, newRefreshToken) => {
-  document.cookie = `token=${newToken}; path=/`;
-  document.cookie = `refresh_token=${newRefreshToken}; path=/`;
+const updateTokens = (accessToken, refreshToken) => {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  // Update tokens in memory or wherever needed
 };
 
-// Fonction pour rafraîchir le token
-const refreshTokens = async () => {
-  const refresh_token = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('refresh_token='))
-    .split('=')[1];
+const getRefreshToken = () => {
+  // Assuming you're storing the refresh token in a cookie
+  return Cookies.get('refresh_token');
+};
 
+const refreshToken = async () => {
   try {
-
+    const refreshToken = getRefreshToken();
     const response = await axios.post(
       '/api/token/refresh',
-      { refresh_token },
+      { refreshToken },
       { withCredentials: true }
     );
-
-    if (response.status === 200) {
-      const newToken = response.data.token;
-      const newRefreshToken = response.data.refresh_token;
-
-
-
-      // Mettre à jour le token et le refresh token dans les cookies
-      updateCookies(newToken, newRefreshToken);
-
-      // Mettre à jour l'en-tête Authorization avec le nouveau token
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-    }
+    const { token, refreshToken: newRefreshToken } = response.data;
+    updateTokens(token, newRefreshToken);
+    return token;
   } catch (error) {
-    console.log(error);
-    // Gérer l'erreur lors du rafraîchissement du token
+    // Handle token refresh failure
+    throw error;
+  } finally {
+    isRefreshing = false;
   }
 };
 
-// Démarrer l'intervalle de rafraîchissement du token
-let refreshInterval = setInterval(refreshTokens, 10000); // 10 secondes
+const scheduleRefresh = (expiryTime) => {
+  const delay = expiryTime - Date.now() - 30000; // Refresh 30 seconds before expiry
+  setTimeout(refreshTokens, delay);
+};
+
+// Define the refreshTokens function
+const refreshTokens = () => {
+  // Implement your logic to refresh tokens here
+  if (!isRefreshing) {
+    isRefreshing = true;
+    refreshPromise = refreshToken()
+      .then((token) => {
+        const expiryTime = Date.now() + (2592000 * 1000); // 30 days in milliseconds
+        scheduleRefresh(expiryTime);
+        return token;
+      })
+      .catch((error) => {
+        console.error('Failed to refresh token:', error);
+        throw error;
+      });
+  }
+
+  return refreshPromise;
+};
 
 axios.interceptors.response.use(
-  resp => resp,
-  async error => {
-    if (error.response.status === 401 && !refresh) {
-      refresh = true;
-
-      // Effacer l'intervalle de rafraîchissement du token
-      clearInterval(refreshInterval);
-
-      // Effectuer le rafraîchissement du token
-      await refreshTokens();
-
-      // Reprendre l'intervalle de rafraîchissement du token
-      refreshInterval = setInterval(refreshTokens, 10000); // 10 secondes
-
-      // Réessayer la requête échouée avec le nouveau token
-      error.config.headers['Authorization'] = `Bearer ${document.cookie
-        .split('; ')
-        .find(row => row.startsWith('token='))
-        .split('=')[1]}`;
-
-      return axios.request(error.config);
+  response => {
+    // Update access token expiry time when a new token is received
+    if (response.config.url === '/api/token/refresh') {
+      accessTokenExpiry = Date.now() + (2592000 * 1000); // 30 days in milliseconds
     }
-
-    refresh = false;
+    return response;
+  },
+  async error => {
+    const { config, response: { status } } = error;
+    if (status === 401 && !isRefreshing) {
+      try {
+        const token = await refreshTokens();
+        config.headers['Authorization'] = `Bearer ${token}`;
+        return axios.request(config);
+      } catch (refreshError) {
+        // Handle failed token refresh
+        throw refreshError;
+      }
+    }
     return Promise.reject(error);
   }
 );
 
-export default axios;
+const fetchUserData = async () => {
+  try {
+    const token = Cookies.get('token');
+    if (token) {
+      const response = await axios.get("/api/user/me", {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const userData = response.data;
+      // Save user data to local storage
+      localStorage.setItem('user', JSON.stringify(userData));
+      return userData;
+    } else {
+      throw new Error('Token not found');
+    }
+  } catch (error) {
+    console.error('Failed to fetch user data:', error);
+    throw error;
+  }
+};
+
+export { axios, fetchUserData };

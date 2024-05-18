@@ -121,24 +121,22 @@ function DossiersMedicaux() {
 
 
   const columns = [
-    { title: "CIN", dataIndex: "cin", key: "cin", width: '30%' },
-    { title: "nom", dataIndex: "nom", key: "nom", width: '30%' },
-    { title: "age", dataIndex: "age", key: "age", width: '30%' },
-    { title: "Email", dataIndex: "email", key: "email", width: '30%' },
-    { title: "Tel", dataIndex: "tel", key: "tel", width: '30%' },
-    { title: "Adresse", dataIndex: "adresse", key: "adresse", width: '30%' },
+    { title: "CiN", dataIndex: "cin", key: "cin",  },
+    { title: "Nom", dataIndex: "nom", key: "nom",},
+    { title: "Age", dataIndex: "age", key: "age",  },
+    { title: "Email", dataIndex: "email", key: "email", },
+    { title: "Tel", dataIndex: "tel", key: "tel",},
+    { title: "Adresse", dataIndex: "adresse", key: "adresse",  },
     {
-      title: "Action",
+     
       fixed: 'right',
-      width: '200',
+      
       render: (_, record) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button type="primary" onClick={() => handleAfficherClick(record.id)}>
             Afficher dossier
           </Button>
-          <Popconfirm title="Sure to delete?">
-            <Button danger>Supprimer</Button>
-          </Popconfirm>
+        
         </div>
       ),
     },
@@ -268,10 +266,9 @@ function DossiersMedicaux() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, delay: 0.7 }}
     >
-      <Row>
-        <Col xs={{ span: 1, offset: -1 }}>
+     
           {showTable && (
-            <Space size={20} direction="vertical">
+            <Space size={20} direction="vertical" style={{ width: '100%' }}>
               <Typography.Title level={4}>Dossiers medicaux</Typography.Title>
 
               <Input.Search
@@ -281,6 +278,8 @@ function DossiersMedicaux() {
                 enterButton
               />
               <Table
+               style={{borderRadius: '10px',
+               border: '2px solid rgba(0, 0, 0, 0.1)' }} 
                 loading={loading}
                 columns={columns}
                 dataSource={dataSource}
@@ -288,13 +287,13 @@ function DossiersMedicaux() {
                   current: currentPage,
                   pageSize: pageSize,
                   total: totalItems,
+                  position: ['bottomCenter'],
                 }}
                 onChange={handleTableChange}
               ></Table>
             </Space>
           )}
-        </Col>
-      </Row>
+     
       {showAfficherForm && selectedPatient && (
         <AfficherDossier
           patient={selectedPatient}
