@@ -188,7 +188,7 @@ const AppComponents = () => {
     },
     {
       label: "Formateur",
-      key: "/patien",
+      key: "/formateur",
       icon: <UserAddOutlined />,
      
     },

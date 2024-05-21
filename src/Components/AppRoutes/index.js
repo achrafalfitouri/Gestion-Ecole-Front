@@ -23,6 +23,8 @@ const Patient = lazy(() => import("../../Pages/Patient"));
 const Utilisateur = lazy(() => import("../../Pages/Utilisateur"));
 const Pharmacie = lazy(() => import("../../Pages/Pharmacie"));
 const Examen = lazy(() => import("../../Pages/Examen"));
+const Formateur = lazy(() => import("../../Pages/Formateur"));
+
 
 function AppRoutes() {
 
@@ -62,6 +64,10 @@ function AppRoutes() {
         {/* Patient */}
        
             <Route path="/patient" element={<Patient />} />
+         
+          {/* FORMATEUR */}
+       
+          <Route path="/formateur" element={<Formateur />} />
          
          
        
