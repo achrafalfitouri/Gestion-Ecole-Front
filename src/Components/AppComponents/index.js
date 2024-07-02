@@ -38,7 +38,6 @@ const { Header, Sider, Content, Footer } = Layout;
 
 
 
-const AppRoutes = lazy(() => import("../AppRoutes"));
 
 
 
@@ -123,7 +122,6 @@ const AppComponents = () => {
   const logout = async () => {
     try {
       Cookies.remove('token');
-      Cookies.remove('refresh_token');
       localStorage.removeItem('user');
       localStorage.removeItem('userData');
       await axios.post("logout", {}, { withCredentials: true });

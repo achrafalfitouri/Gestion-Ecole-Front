@@ -4,6 +4,9 @@ import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
 import { Card, Row, Col } from 'antd';
+import Cookies from 'js-cookie';
+
+
 
 const { Item } = Form;
 
@@ -13,21 +16,26 @@ export const Login = () => {
 
   const onFinish = async (values) => {
     try {
-      const { data } = await axios.post('/authentication_token', {
-        email: values.email,
-        password: values.password
-      }, { withCredentials: true });
+      const { data } = await axios.post('/api/auth/login', {
+        Email: values.email,
+        MotDePasse: values.password
+      });
 
-   
-      document.cookie = `token=${data.token}; path=/`;
-      document.cookie = `refresh_token=${data.refresh_token}; path=/`;
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+      // Set the token in cookies
+      Cookies.set('token', data.token, { path: '/' });
 
+      // Set the Authorization header for all future requests
+      axios.defaults.headers.common['Authorization'] = `${data.token}`;
+
+      // Fetch user data and store it in local storage
+      const userResponse = await axios.get('/api/auth/me');
+      localStorage.setItem('user', JSON.stringify(userResponse.data));
+
+      // Navigate to the home page
       setNavigate(true);
     } catch (error) {
       console.log(error);
-      message.error('Invalid credentials', /* duration */ 3).style({ width: '300px' });
+      message.error('Invalid credentials', 3).style({ width: '300px' });
     }
   };
 
